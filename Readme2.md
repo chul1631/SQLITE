@@ -148,7 +148,7 @@ ArtistId  앨범수
 90        21
 ```
 
-### 12. 앨범(albums) 테이블에서 /보유 앨범 수가 10개 이상인 Artist의 `ArtistId`와 `앨범 수` 출력하세요
+### 12. 앨범(albums) 테이블에서 보유 앨범 수가 10개 이상인 Artist의 `ArtistId`와 `앨범 수` 출력하세요
 | 단, 앨범 수를 기준으로 내림차순으로 출력하세요.
 ```sql
 SELECT ArtistId, COUNT(AlbumId) AS '앨범 수'
@@ -166,36 +166,97 @@ ArtistId  앨범 수
 150       10
 ```
 
-### 13. 고객(customers) 테이블에서 /// `State`가 존재하는 고객들을 /// `Country` 와 `State`를 기준으로 그룹화해서 //// 각 그룹의 `고객 수`, `Country`, `State` 를 출력하세요.
+### 13. 고객(customers) 테이블에서  `State`가 존재하는 고객들을 `Country` 와 `State`를 기준으로 그룹화해서 각 그룹의 `고객 수`, `Country`, `State` 를 출력하세요.
 | 단, `고객 수`, `Country` 순서 기준으로 내림차순으로 5개까지 출력하세요.
 ```sql 
-SELECT SupporRepid '고객수', Country, State
+
+SELECT COUNT (Customerid) '고객수', Country, State
 FROM customers
-GROUP BY Country, State
+GROUP BY  Country, State
+HAVING COUNT(State) >= 1 
+ORDER BY 고객수 DESC, COUNTRY DESC LIMIT 5;
+
+고객수  Country  State
+---  -------  -----
+3    USA      CA
+3    Brazil   SP
+2    Canada   ON
+1    USA      WI
+1    USA      WA
 
 ```
 
 ### 14.  고객(customers) 테이블에서 `Fax` 가 `NULL`인 고객은 'X' NULL이 아닌 고객은 'O'로 `Fax 유/무` 컬럼에 표시하여 출력하세요.
 | 단, `CustomerId`와 `Fax 유/무` 컬럼만 출력하고, `CustomerId` 기준으로 오름차순으로 5개까지 출력하세요. 
 ```sql 
+SELECT CustomerId, 
+CASE
+  WHEN Fax IS NULL THEN 'X'
+  ELSE 'O'
+  END 'Fax 유/무' 
+FROM customers
+ORDER BY CustomerId ASC LIMIT 5;
+
+CustomerId  Fax 유/무
+----------  -------
+1           O
+2           X
+3           X
+4           X
+5           O
+
 ```
 
 ### 15. 점원(employees) 테이블에서 `올해년도 - BirthDate 년도 + 1` 를 계산해서 `나이` 컬럼에 표시하여 출력하세요.
 | 단, 점원의 `LastName`, `FirstName`, `나이` 컬럼만 출력하고, `EmployeeId`를 기준으로 오름차순으로 출력하세요.
-
 | cast(), strftime(), 오늘 날짜를 구하는 함수를 검색하고, 활용해보세요.
+
 ```sql 
+SELECT LastName, FirstName,  strftime('%Y', 'now') - strftime ('%Y', BirthDate) +1 '나이'
+FROM employees
+ORDER BY EmployeeId ASC;
+
+LastName  FirstName  나이
+--------  ---------  --
+Adams     Andrew     61
+Edwards   Nancy      65
+Peacock   Jane       50
+Park      Margaret   76
+Johnson   Steve      58
+Mitchell  Michael    50
+King      Robert     53
+Callahan  Laura      55
 
 ``` 
 
 ### 16. 가수(artists) 테이블에서 앨범(albums)의 개수가 가장 많은 가수의 `Name`을 출력하세요.
 | artists 테이블과 albums 테이블의 `ArtistId` 활용하세요.
-```sql 
+```sql
+SELECT (SELECT b.Name
+        FROM artists b
+        WHERE b.artistId = a.artistId) as 'Name'
+FROM albums a
+GROUP BY a.artistId
+ORDER BY COUNT(a.artistId) DESC LIMIT 1;
+
+Name
+-----------
+Iron Maiden
 ```
 
 ### 17. 장르(genres) 테이블에서 음악(tracks)의 개수가 가장 적은 장르의 `Name`을 출력하세요.
 | genres 테이블과 tracks 테이블의 `GenreId` 활용하세요.
 ```sql 
+SELECT (SELECT b.Name
+        FROM genres b
+        WHERE b.GenreId = a.GenreId) as 'Name'
+FROM tracks a
+GROUP BY a.GenreId
+ORDER BY COUNT(a.GenreId) ASC LIMIT 1;
+
+Name
+-----
+Opera
 ```
 
 
